@@ -36,6 +36,16 @@ spi_slave_t sharp_memlcd_slave = {
 
 #if SHARP_MEMLCD_INTEGRATED_BUILD
 
+void sharp_memlcd_interface_init(void){
+    spi_init_slave(SHARP_MEMLCD_SPI_INTFNUM, &sharp_memlcd_slave);
+    gpio_conf_output(SHARP_MEMLCD_SPI_CS_PORT, SHARP_MEMLCD_SPI_CS_PIN);
+    sharp_memlcd_spi_deselect();
+    gpio_conf_output(SHARP_MEMLCD_ENABLE_PORT, SHARP_MEMLCD_ENABLE_PIN);
+    sharp_memlcd_disable();
+    gpio_conf_output(SHARP_MEMLCD_COMINV_PORT, SHARP_MEMLCD_COMINV_PIN);
+    sharp_memlcd_cominv_low();
+}
+
 void sharp_memlcd_spi_select(void){
     gpio_set_output_low(SHARP_MEMLCD_SPI_CS_PORT, SHARP_MEMLCD_SPI_CS_PIN);
 }

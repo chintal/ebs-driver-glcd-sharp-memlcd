@@ -29,4 +29,8 @@
 
 void sharp_memlcd_init(void);
 
+void sharp_memlcd_write_row(uint8_t row, uint8_t * data);
+
+void sharp_memlcd_write_image(uint8_t * framebuffer);
+
 #endif

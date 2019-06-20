@@ -44,8 +44,8 @@
  *   - GPIO initialization for enable (Output, Low)
  *   - GPIO initialization for cominv (Output, Low)
  * 
- * Integrated builds will use an inlined version of this function provided
- * by this file which rely on EBS HAL APIs. The application will be expected
+ * Integrated builds will use a version of this function provided within this
+ * library which relies on EBS HAL APIs. The application will be expected
  * to perform SPI Master initialization, and nothing else.
  * 
  * The sharp_memlcd_interface_init() function must exist at application link 
@@ -61,7 +61,7 @@
  * should generally be done before the library's primary initialization 
  * function is called. 
  */
-SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_interface_init(void);
+extern void sharp_memlcd_interface_init(void);
 
 
 /**
@@ -190,17 +190,6 @@ extern spi_slave_t sharp_memlcd_slave;
  * `asp/bsp/board.h`, depending on the architecture of the application and 
  * of the hardware.
 */
-
-
-SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_interface_init(void){
-    spi_init_slave(SHARP_MEMLCD_SPI_INTFNUM, &sharp_memlcd_slave);
-    gpio_conf_output(SHARP_MEMLCD_SPI_CS_PORT, SHARP_MEMLCD_SPI_CS_PIN);
-    sharp_memlcd_spi_deselect();
-    gpio_conf_output(SHARP_MEMLCD_ENABLE_PORT, SHARP_MEMLCD_ENABLE_PIN);
-    sharp_memlcd_disable();
-    gpio_conf_output(SHARP_MEMLCD_COMINV_PORT, SHARP_MEMLCD_COMINV_PIN);
-    sharp_memlcd_cominv_low();
-}
 
 SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_spi_enqueue_transaction(spi_transaction_t * transaction){
     spi_enqueue_transaction(SHARP_MEMLCD_SPI_INTFNUM, transaction);
