@@ -20,13 +20,17 @@
 */
 
 
-#ifndef DRIVER_SHARP_MEMLCD_H
-#define DRIVER_SHARP_MEMLCD_H
+#ifndef DRIVER_SHARP_MEMLCD_PANELS_H
+#define DRIVER_SHARP_MEMLCD_PANELS_H
 
 #include "config.h"
-#include "panels.h"
-#include "interface.h"
 
-void sharp_memlcd_init(void);
+#define SHARP_MEMLCD_LS013B4DN04        0
+
+#if SHARP_MEMLCD_PANEL == SHARP_MEMLCD_LS013B4DN04
+    #define SHARP_MEMLCD_NROWS          96
+    #define SHARP_MEMLCD_NCOLS          96
+#endif
 
 #endif
+
