@@ -1,7 +1,9 @@
 
 
+#ifndef DRIVER_SHARP_MEMLCD_H
+#define DRIVER_SHARP_MEMLCD_H
+
 #include <platform/types.h>
-#include "hal/uc/gpio.h"
-#include "hal/uc/spi.h"
+#include "interface.h"
 
-
+#endif
