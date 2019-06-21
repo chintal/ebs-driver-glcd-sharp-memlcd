@@ -22,9 +22,13 @@
 
 #include "memlcd.h"
 
-spi_slave_t sharp_memlcd_slave = {
-    #if SPI_SUPPORT_SCLK_CTL
-        (0x00),
+
+const spi_slave_t sharp_memlcd_slave = {
+    #if APP_SUPPORT_SPI_CTL
+    {{
+        SPI_CLKPHA_CHG_CAP, SPI_CLKPOL_AL, SPI_DATA_LSBFIRST, SPI_DATA_8BIT,
+        (uint8_t)(SHARP_MEMLCD_SPI_BASE_FREQ / (SHARP_MEMLCD_SPI_CLK_FREQ * 2))
+    }},
     #endif
     SPI_SELECTOR_FUNC,
     {{
@@ -59,3 +63,27 @@ void sharp_memlcd_spi_deselect(void){
 void sharp_memlcd_init(void){
     sharp_memlcd_interface_init();
 }
+
+void sharp_memlcd_vcom_toggle(void){
+    ;
+}
+
+void sharp_memlcd_write_row(uint8_t row, uint8_t * data){
+    ;
+}
+
+void sharp_memlcd_write_region(uint8_t * row, uint8_t nrows, uint8_t * data){
+    ;
+}
+
+void sharp_memlcd_write_image(image_t * image){
+    ;
+}
+
+#if SHARP_MEMLCD_FRAMEBUFFER
+
+void sharp_memlcd_write_framebuffer(void){
+    ;
+}
+
+#endif

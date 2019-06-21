@@ -27,10 +27,191 @@
 #include "panels.h"
 #include "interface.h"
 
-void sharp_memlcd_init(void);
+#include <graphics/image.h>
 
+
+/**
+ * @name Sharp Memory LCD Initialization Functions
+ */
+/**@{*/ 
+
+/**
+ * @brief Initialize the Sharp Memory LCD 
+ */
+void sharp_memlcd_init(void);
+/**@}*/
+
+
+/**
+ * @name Sharp Memory LCD Maintenance Functions
+ */
+/**@{*/ 
+
+/**
+ * @brief Toggle the Sharp Memory LCD Vcom
+ * 
+ * This function should be called atleast once every minute. 
+ * 
+ * If the define SHARP_MEMLCD_COMINV_AUTO is set, this library will make sure 
+ * that happens by means of a cron job from EBS libtime. If it is not, the 
+ * application must ensure it does by whatever means it can.
+ */
+void sharp_memlcd_vcom_toggle(void);
+/**@}*/
+
+
+/**
+ * @name Sharp Memory LCD State Machine and associated types
+ */
+/**@{*/ 
+
+typedef enum SHARP_MEMLCD_STATE_t{
+    SHARP_MEMLCD_STATE_PREINIT,
+    SHARP_MEMLCD_STATE_IDLE,
+    SHARP_MEMLCD_STATE_SENT_ROWID,
+    SHARP_MEMLCD_STATE_SENT_ROWDATA,
+}sharp_memlcd_state_t;
+
+typedef enum SHARP_MEMLCD_ACTION_TYPE_t{
+    SHARP_MEMLCD_ACTION_WRITE_REGION,
+    #if SHARP_MEMLCD_IMAGE_WRITER
+        SHARP_MEMLCD_ACTION_WRITE_IMAGE,
+    #endif
+}sharp_memlcd_action_type_t;
+
+typedef struct SHARP_MEMLCD_ACTION_t{
+    struct SHARP_MEMLCD_ACTION_t * next;
+    struct{
+        sharp_memlcd_action_type_t type : 1;
+        uint8_t reserved: 7;
+    };
+    uint8_t row;
+    uint8_t * row_data;
+    union{
+        #if SHARP_MEMLCD_IMAGE_WRITER
+            image_t * image;
+        #endif
+        uint8_t end_condition;
+    };
+}sharp_memlcd_action_t;
+
+typedef struct SHARP_MEMLCD_SM_t{
+    struct{
+        sharp_memlcd_state_t state : 2;
+        _Bool vcom : 1;
+        uint8_t reserved : 5;
+    };
+    sharp_memlcd_action_t * current_action;
+    #if SHARP_MEMLCD_MANAGER
+    fifoq_t *const action_queue;
+    #endif
+}sharp_memlcd_sm_t;
+
+
+/**
+ * @brief Sharp Memory LCD State Machine
+ * 
+ * This state machine function should get called when there is something to 
+ * do. The application would typically not call this directly. The driver
+ * library functions will call this function as needed, and it will setup
+ * subsequent calls to itself using appropriate callbacks as needed.
+ * 
+ */
+void sharp_memlcd_sm(void);
+
+/**@}*/
+
+
+/**
+ * @name Sharp Memory LCD Low Level Direct Write Functions
+ */
+/**@{*/ 
+
+/**
+ * @brief Write a single row to the Sharp Memory LCD
+ * 
+ * This function can be used to directly write to the Sharp Memory LCD. This 
+ * function bypasses the framebuffer entirely and therefore would typically 
+ * not be used directly an application which uses the framebuffer and the 
+ * graphics primitives from EBS libgraphics.
+ * 
+ * This function is internally used by the driver to perform the actual LCD
+ * write. 
+ * 
+ * If the memlcd transaction manager is not enabled, the caller of this 
+ * function must ensure the LCD is in an idle state before calling this 
+ * functions.
+ */
 void sharp_memlcd_write_row(uint8_t row, uint8_t * data);
 
-void sharp_memlcd_write_image(uint8_t * framebuffer);
+/**
+ * @brief Write a region to the Sharp Memory LCD
+ * 
+ * This function can be used to directly write to the Sharp Memory LCD. This 
+ * function bypasses the framebuffer entirely and therefore would typically 
+ * not be used directly an application which uses the framebuffer and the 
+ * graphics primitives from EBS libgraphics.
+ * 
+ * This function is internally used by the driver to perform the actual LCD
+ * write.
+ * 
+ * If the memlcd transaction manager is not enabled, the caller of this 
+ * function must ensure the LCD is in an idle state before calling this 
+ * functions.
+ */
+void sharp_memlcd_write_region(uint8_t * row, uint8_t nrows, uint8_t * data);
+/**@}*/
+
+
+#if SHARP_MEMLCD_IMAGE_WRITER
+/**
+ * @name Sharp Memory LCD Special Direct Write Functions
+ */
+/**@{*/ 
+
+/**
+ * @brief Write an image to the Sharp Memory LCD
+ * 
+ * This is a convenience function which writes a libgraphics image to the LCD.
+ * Since this bypasses the framebuffer, it can only write full screen images.
+ * Most applications will probably use the framebuffer's image write functions
+ * instead.
+ * 
+ * This function can be used to directly write to the Sharp Memory LCD. This 
+ * function bypasses the framebuffer entirely and therefore would typically 
+ * not be used directly an application which uses the framebuffer and the 
+ * graphics primitives from EBS libgraphics.
+ * 
+ * If the memlcd transaction manager is not enabled, the caller of this 
+ * function must ensure the LCD is in an idle state before calling this 
+ * function.
+ */
+void sharp_memlcd_write_image(image_t * image);
+/**@}*/
+#endif
+
+
+#if SHARP_MEMLCD_FRAMEBUFFER
+
+
+/**
+ * @name Sharp Memory LCD Framebuffer Support Interface
+ */
+/**@{*/ 
+
+
+// extern framebuffer_t sharp_memlcd_framebuffer;
+
+/**
+ * @brief Write the framebuffer to the Sharp Memory LCD
+ * 
+ * The framebuffer will generally be manipulated by functions and primitives
+ * provided by EBS libgraphics
+ */
+void sharp_memlcd_write_framebuffer(void);
+/**@}*/
+
+#endif
+
 
 #endif

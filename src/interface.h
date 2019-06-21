@@ -169,7 +169,7 @@ SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_low(void);
  * likely not going to be any need to do so. The slave definition will 
  * generally be provided along with each SPI transaction.
  */
-extern spi_slave_t sharp_memlcd_slave;
+extern const spi_slave_t sharp_memlcd_slave;
 
 
 #if SHARP_MEMLCD_INTEGRATED_BUILD
