@@ -131,6 +131,8 @@ SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_enable(void);
  */
 SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_disable(void);
 
+#if SHARP_MEMLCD_COMINV_HW
+
 /**
  * @brief Set the Sharp Memory LCD VCOM to 1
  *  
@@ -158,6 +160,8 @@ SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_high(void);
  * by this file which rely on EBS HAL APIs.
  */
 SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_low(void);
+
+#endif
 
 /**
  * @brief Sharp Memory LCD SPI Slave Definition.
@@ -203,6 +207,7 @@ SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_disable(void){
     gpio_set_output_low(SHARP_MEMLCD_ENABLE_PORT, SHARP_MEMLCD_ENABLE_PIN);
 }
 
+#if (SHARP_MEMLCD_COMINV == SHARP_MEMLCD_COMINV_HW_CRON)
 SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_high(void){
     gpio_set_output_high(SHARP_MEMLCD_COMINV_PORT, SHARP_MEMLCD_COMINV_PIN);
 }
@@ -210,6 +215,7 @@ SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_high(void){
 SHARP_MEMLCD_INTERFACE_FUNC void sharp_memlcd_cominv_low(void){
     gpio_set_output_low(SHARP_MEMLCD_COMINV_PORT, SHARP_MEMLCD_COMINV_PIN);
 }
+#endif
 
 #endif
 
